@@ -46,12 +46,12 @@ async function compareHash(plainData, hashedData) {
  * @param {string} userId - The user ID for which the JWT is generated.
  * @returns {string} The generated JWT.
  */
-function generateJWT(id, username) {
+function generateJWT(sub, username) {
   const secretKey = process.env.JWT_SECRET;
   const expiresIn = process.env.EXPIRE_IN;
 
   try {
-    return jwt.sign({ id, username }, secretKey, { expiresIn, algorithm: 'HS256' });
+    return jwt.sign({ sub, username }, secretKey, { expiresIn, algorithm: 'HS256' });
   } catch (error) {
     console.error('Error generating JWT:', error);
     throw error;

@@ -23,7 +23,7 @@ function authenticateToken(req, res, next) {
     }
 
     const decodedUserId = verifyToken(token);
-    req.user = { id: decodedUserId.id, username: decodedUserId.username };
+    req.user = { id: decodedUserId.sub, username: decodedUserId.username };
     next();
   } catch (error) {
     if (error.name === 'TokenExpiredError') {

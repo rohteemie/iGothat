@@ -53,11 +53,11 @@ async function login(req, res) {
 
         const userData = await User.findOne({
             where: { email },
-            attributes: ['first_name', 'username', 'email']
+            attributes: ['id', 'first_name', 'username', 'email']
         });
 
         // Reset failed login count and generate tokens
-        const accessToken = generateJWT(user.id, userData.username);
+        const accessToken = generateJWT(sub = userData.id, username = userData.username);
         const refreshToken = uuidv4();
         await Auth.update(
             { failed_login_count: 0, account_locked: false, refresh_token: refreshToken },
@@ -95,14 +95,16 @@ async function refreshAccessToken(req, res) {
   try {
     // Find the user with the provided refresh token
     const authRecord = await Auth.findOne({ where: { refresh_token: refreshToken } });
-    const userRecord = await User.findOne({ where: { email } });
 
-    if (!authRecord || !userRecord) {
+    if (!authRecord) {
       return res.status(403).json({ message: 'Invalid refresh token' });
     }
 
+    const email = authRecord.email
+    const userRecord = await User.findOne({ where: { email } });
+
     // Generate a new access token
-    const newAccessToken = generateJWT(authRecord.id, userRecord.username);
+    const newAccessToken = generateJWT(sub = userRecord.id, username = userRecord.username);
 
     return res.status(200).json({
       accessToken: newAccessToken,
